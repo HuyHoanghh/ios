@@ -27,12 +27,12 @@ While locked, press `Esc` to display the **Ở lại / Thoát** confirmation. Th
 shortcuts are the only keyboard input intercepted; everything else is passed to the
 web page. Close the normal window to show the same exit confirmation.
 
-While the app is unlocked (including `--demo`), standard macOS editing and capture
-shortcuts are available. Use `Command + Shift + 4` to select an area and save a
-screenshot, or `Control + Command + Shift + 4` to copy the selected area to the
-clipboard. Cut, copy, paste, and Select All are available from the Edit menu and
-their normal keyboard shortcuts. Entering locked mode disables screen capture for
-the app window, blocks clipboard shortcuts, and clears the clipboard.
+While the app is unlocked (including `--demo`), two-key capture shortcuts are
+available. Use `Command + 4` to select an area and save a screenshot to the Desktop,
+or `Command + 5` to copy the selected area to the clipboard. Cut, copy, paste, and
+Select All are available from the Edit menu and their normal keyboard shortcuts.
+Entering locked mode disables screen capture for the app window, blocks clipboard
+shortcuts, and clears the clipboard.
 
 For UI testing without macOS kiosk restrictions, add `--demo` before the URL. Demo
 mode is not intended for a real exam session.

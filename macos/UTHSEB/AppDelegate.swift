@@ -186,6 +186,17 @@ final class BrowserWindowController: NSWindowController, NSWindowDelegate, WKNav
             guard let self else { return event }
             let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
+            if !self.screenLockEnabled && modifiers == [.command] {
+                if event.keyCode == 21 {
+                    self.captureSelectedArea(copyToClipboard: false)
+                    return nil
+                }
+                if event.keyCode == 23 {
+                    self.captureSelectedArea(copyToClipboard: true)
+                    return nil
+                }
+            }
+
             if self.screenLockEnabled {
                 if event.keyCode == 53 {
                     self.confirmExit()
@@ -195,8 +206,8 @@ final class BrowserWindowController: NSWindowController, NSWindowDelegate, WKNav
                 let character = event.charactersIgnoringModifiers?.lowercased()
                 let isClipboardShortcut = modifiers.contains(.command) &&
                     ["c", "x", "v"].contains(character ?? "")
-                let isScreenshotShortcut = event.keyCode == 21 &&
-                    modifiers.contains([.command, .shift])
+                let isScreenshotShortcut = [21, 23].contains(event.keyCode) &&
+                    modifiers.contains(.command)
                 if isClipboardShortcut || isScreenshotShortcut {
                     NSSound.beep()
                     return nil
@@ -209,6 +220,32 @@ final class BrowserWindowController: NSWindowController, NSWindowDelegate, WKNav
             }
             self.toggleScreenLock()
             return nil
+        }
+    }
+
+    private func captureSelectedArea(copyToClipboard: Bool) {
+        guard !screenLockEnabled else {
+            NSSound.beep()
+            return
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
+        if copyToClipboard {
+            process.arguments = ["-i", "-c"]
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd 'at' HH.mm.ss"
+            let fileName = "UTHSEB Screenshot \(formatter.string(from: Date())).png"
+            let desktop = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first
+                ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
+            process.arguments = ["-i", desktop.appendingPathComponent(fileName).path]
+        }
+
+        do {
+            try process.run()
+        } catch {
+            NSSound.beep()
         }
     }
 
