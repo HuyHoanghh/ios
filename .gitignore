@@ -1,0 +1,14 @@
+.DS_Store
+
+# Swift compiler caches
+.build/
+
+# Generated application bundles and archives
+dist/
+
+# Recovered Windows binaries and extracted runtime files
+recovered/
+
+# Python caches
+__pycache__/
+*.py[cod]

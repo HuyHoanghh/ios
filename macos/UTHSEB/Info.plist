@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key><string>vi</string>
+    <key>CFBundleDisplayName</key><string>UTH SEB</string>
+    <key>CFBundleExecutable</key><string>UTHSEB</string>
+    <key>CFBundleIdentifier</key><string>vn.edu.uth.uthseb</string>
+    <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+    <key>CFBundleName</key><string>UTHSEB</string>
+    <key>CFBundlePackageType</key><string>APPL</string>
+    <key>CFBundleShortVersionString</key><string>1.0.4</string>
+    <key>CFBundleVersion</key><string>104</string>
+    <key>LSMinimumSystemVersion</key><string>12.0</string>
+    <key>NSHighResolutionCapable</key><true/>
+    <key>NSCameraUsageDescription</key><string>UTH SEB cần quyền camera nếu bài thi yêu cầu giám sát trực tuyến.</string>
+    <key>NSMicrophoneUsageDescription</key><string>UTH SEB cần quyền micrô nếu bài thi yêu cầu giám sát trực tuyến.</string>
+    <key>CFBundleURLTypes</key>
+    <array><dict>
+        <key>CFBundleURLName</key><string>vn.edu.uth.uthseb</string>
+        <key>CFBundleURLSchemes</key><array><string>uthseb</string></array>
+    </dict></array>
+</dict>
+</plist>
