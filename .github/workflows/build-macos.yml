@@ -1,0 +1,43 @@
+name: Build macOS app
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "macos/**"
+      - ".github/workflows/build-macos.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build UTHSEB (Apple Silicon)
+    runs-on: macos-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Build app
+        run: sh macos/build.sh
+
+      - name: Verify app
+        run: |
+          test -x dist/UTHSEB.app/Contents/MacOS/UTHSEB
+          file dist/UTHSEB.app/Contents/MacOS/UTHSEB | grep -q arm64
+          codesign --verify --deep --strict dist/UTHSEB.app
+
+      - name: Package app
+        run: ditto -c -k --sequesterRsrc --keepParent dist/UTHSEB.app UTHSEB-macOS-arm64.zip
+
+      - name: Upload build
+        uses: actions/upload-artifact@v7
+        with:
+          name: UTHSEB-macOS-arm64
+          path: UTHSEB-macOS-arm64.zip
+          if-no-files-found: error
+          retention-days: 30
