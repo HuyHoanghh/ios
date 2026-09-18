@@ -27,6 +27,13 @@ While locked, press `Esc` to display the **Ở lại / Thoát** confirmation. Th
 shortcuts are the only keyboard input intercepted; everything else is passed to the
 web page. Close the normal window to show the same exit confirmation.
 
+While the app is unlocked (including `--demo`), standard macOS editing and capture
+shortcuts are available. Use `Command + Shift + 4` to select an area and save a
+screenshot, or `Control + Command + Shift + 4` to copy the selected area to the
+clipboard. Cut, copy, paste, and Select All are available from the Edit menu and
+their normal keyboard shortcuts. Entering locked mode disables screen capture for
+the app window, blocks clipboard shortcuts, and clears the clipboard.
+
 For UI testing without macOS kiosk restrictions, add `--demo` before the URL. Demo
 mode is not intended for a real exam session.
 
@@ -39,7 +46,7 @@ The supplied Windows build currently has its process-action policy disabled
 (`GetAction` returns `None`). The production macOS build mirrors that behavior, so it
 can be launched from Chrome without immediately treating the calling browser as a
 forbidden process. Screen locking is off by default and is controlled explicitly by
-`Control + 5`; clipboard clearing and multiple-display enforcement remain disabled.
+`Control + 5`; multiple-display enforcement remains disabled.
 The custom user agent and authenticated top-level GET/HEAD navigation remain enabled.
 POST requests are deliberately left untouched so Moodle login form bodies are not
 lost when WebKit submits them.

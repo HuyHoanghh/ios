@@ -25,6 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        installMainMenu()
         let argumentTarget = CommandLine.arguments.dropFirst()
             .compactMap(URL.init(string:))
             .compactMap { launchTarget(from: $0) }
@@ -32,6 +33,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         browserController = BrowserWindowController(launchURL: pendingURL ?? argumentTarget)
         browserController?.showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func installMainMenu() {
+        let mainMenu = NSMenu()
+
+        let applicationMenuItem = NSMenuItem()
+        mainMenu.addItem(applicationMenuItem)
+        let applicationMenu = NSMenu()
+        applicationMenu.addItem(
+            withTitle: "Quit UTH SEB",
+            action: #selector(NSApplication.terminate(_:)),
+            keyEquivalent: "q"
+        )
+        applicationMenuItem.submenu = applicationMenu
+
+        let editMenuItem = NSMenuItem()
+        mainMenu.addItem(editMenuItem)
+        let editMenu = NSMenu(title: "Edit")
+        editMenu.addItem(withTitle: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+        editMenu.addItem(withTitle: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c")
+        editMenu.addItem(withTitle: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v")
+        editMenu.addItem(NSMenuItem.separator())
+        editMenu.addItem(withTitle: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        editMenuItem.submenu = editMenu
+
+        NSApp.mainMenu = mainMenu
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -116,7 +143,8 @@ final class BrowserWindowController: NSWindowController, NSWindowDelegate, WKNav
         window.collectionBehavior = [.fullScreenPrimary]
         window.level = .normal
         window.isReleasedWhenClosed = false
-        window.sharingType = .none
+        // macOS screenshot shortcuts may capture the app only while it is unlocked.
+        window.sharingType = .readOnly
         window.contentView = webView
 
         super.init(window: window)
@@ -158,9 +186,21 @@ final class BrowserWindowController: NSWindowController, NSWindowDelegate, WKNav
             guard let self else { return event }
             let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
-            if self.screenLockEnabled && event.keyCode == 53 {
-                self.confirmExit()
-                return nil
+            if self.screenLockEnabled {
+                if event.keyCode == 53 {
+                    self.confirmExit()
+                    return nil
+                }
+
+                let character = event.charactersIgnoringModifiers?.lowercased()
+                let isClipboardShortcut = modifiers.contains(.command) &&
+                    ["c", "x", "v"].contains(character ?? "")
+                let isScreenshotShortcut = event.keyCode == 21 &&
+                    modifiers.contains([.command, .shift])
+                if isClipboardShortcut || isScreenshotShortcut {
+                    NSSound.beep()
+                    return nil
+                }
             }
 
             guard event.keyCode == 23, modifiers.contains(.control),
@@ -178,6 +218,8 @@ final class BrowserWindowController: NSWindowController, NSWindowDelegate, WKNav
 
         if screenLockEnabled {
             unlockedFrame = window.frame
+            window.sharingType = .none
+            NSPasteboard.general.clearContents()
             NSApp.presentationOptions = [
                 .hideDock,
                 .hideMenuBar,
@@ -195,6 +237,7 @@ final class BrowserWindowController: NSWindowController, NSWindowDelegate, WKNav
             window.makeKeyAndOrderFront(nil)
         } else {
             NSApp.presentationOptions = []
+            window.sharingType = .readOnly
             window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
             window.collectionBehavior = [.fullScreenPrimary]
             window.level = .normal
